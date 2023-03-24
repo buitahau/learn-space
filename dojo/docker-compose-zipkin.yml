@@ -1,0 +1,53 @@
+version: '2.4'
+
+services:
+  storage:
+    image: ghcr.io/openzipkin/zipkin-mysql
+    container_name: mysqlzk
+    # Uncomment to expose the storage port for testing
+    ports:
+      - 3307:3306
+    volumes:
+      - dbfiles:/mysql/data/zipkin
+    restart: unless-stopped
+
+  # Use MySQL instead of in-memory storage
+  zipkin:
+    image: ghcr.io/openzipkin/zipkin
+    container_name: zipkin
+    # Environment settings are defined here https://github.com/openzipkin/zipkin/blob/master/zipkin-server/README.md#environment-variables
+    environment:
+      - STORAGE_TYPE=mysql
+      - MYSQL_HOST=storage
+      # Add the baked-in username and password for the zipkin-mysql image
+      - MYSQL_USER=zipkin
+      - MYSQL_PASS=zipkin
+      - MYSQL_PORT=3307
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+    # Uncomment to enable debug logging
+    # command: --logging.level.zipkin2=DEBUG
+    depends_on:
+      - storage
+    restart: unless-stopped
+
+  dependencies:
+    image: ghcr.io/openzipkin/zipkin-dependencies
+    container_name: dependencies
+    entrypoint: crond -f
+    environment:
+      - STORAGE_TYPE=mysql
+      - MYSQL_HOST=storage
+      - MYSQL_PORT=3307
+      # Add the baked-in username and password for the zipkin-mysql image
+      - MYSQL_USER=zipkin
+      - MYSQL_PASS=zipkin
+      # Uncomment to adjust memory used by the dependencies job
+      - JAVA_OPTS=-verbose:gc -Xms512m -Xmx512m
+    depends_on:
+      - storage
+    restart: unless-stopped
+
+volumes:
+  dbfiles:

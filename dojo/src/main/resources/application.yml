@@ -1,0 +1,27 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /dojo
+spring:
+  application:
+    name: dojo
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+#          issuer-url: http://localhost:8180/auth/realms/Dojo
+          jwk-set-uri: http://localhost:8180/auth/realms/Dojo/protocol/openid-connect/certs
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    baseUrl: http://localhost:9411
+    enabled: true
+application:
+  keycloak:
+    base-uri: http://localhost:8180/auth/realms/Dojo/protocol/openid-connect
+    client-id: login-app
+    client-secret: WLPvX7QyxSg7TIKwVfUrSQiB3IvqEj8d
+    grant-type: password
+    scope: openid profile
+    auth-uri: /token

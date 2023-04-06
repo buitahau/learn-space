@@ -34,3 +34,13 @@ https://developers.redhat.com/blog/2020/11/24/authentication-and-authorization-u
 Run zipkin server
 
 ``docker-compose -f docker-compose-zipkin.yml up``
+
+---
+
+Jib tutorial
+
+``mvn clean install jib:dockerBuild -Dapp.image.tag={tag}``
+
+https://betulsahinn.medium.com/dockerizing-a-spring-boot-application-and-using-the-jib-maven-plugin-95c329866f34
+
+https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin
